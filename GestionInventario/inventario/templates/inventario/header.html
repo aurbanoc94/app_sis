@@ -1,0 +1,24 @@
+{% load static %}
+<div class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand" href="#">Mi Tienda</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a href="{% url 'inventario:limpiar_carrito' %}" class="btn btn-danger">Limpiar Carrito</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'inventario:home' %}">Inicio</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'inventario:producto-list' %}">Tienda</a></li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'inventario:carrito' %}" style="position: relative;">
+                        <i class="bi bi-cart3" style="font-size: 1.5rem;"></i> 
+                        <span class="badge bg-danger cart-counter" style="position: absolute; top: -5px; right: -5px; font-size: 0.8rem; padding: 0.2rem 0.5rem;">
+                            {{ total_productos|default:0 }}
+                        </span>
+                    </a>
+                </li>                             
+            </ul>
+        </div>
+    </div>
+</div>       
