@@ -73,8 +73,8 @@
 
             <!-- Botones de acción -->
             <div class="mt-4 text-center">
-                <a href="/checkout/" class="btn btn-primary btn-lg">Proceder a la compra</a>
-                <a href="{% url 'inventario:producto-list' %}">Seguir comprando</a>
+                <a href="/checkout/" class="btn btn-primary">Proceder a la compra</a>
+                <a href="{% url 'inventario:producto-list' %}" class="btn btn-secondary">Seguir comprando</a>
             </div>
       
         {% else %}

@@ -17,13 +17,13 @@ def agregar_al_carrito(request, producto_id):
         try:
             producto = Producto.objects.get(ProductoID=producto_id)
             
-            # Verificar que la cantidad no exceda el stock
+            # Verificar si la cantidad es mayor que el stock disponible
             if cantidad > producto.Stock:
                 return JsonResponse({'error': 'No hay suficiente stock disponible'}, status=400)
             
             # Inicializar el carrito si no existe
             carrito = request.session.get('carrito', {})
-            
+
             # Si el producto ya está en el carrito, sumamos las cantidades
             if str(producto_id) in carrito:
                 carrito[str(producto_id)]['cantidad'] += cantidad
@@ -39,19 +39,15 @@ def agregar_al_carrito(request, producto_id):
                     'imagen': producto.imagen.url if producto.imagen else None,
                     'stock': producto.Stock,
                 }
-            
+
             # Guardar el carrito actualizado en la sesión
             request.session['carrito'] = carrito
-            
+
             # Calcular y guardar el total de productos en la sesión
             total_productos = sum(item['cantidad'] for item in carrito.values())
             request.session['total_productos'] = total_productos
-            request.session.modified = True  # Indica que la sesión ha sido modificada
-            
-            # Depuración
-            print(f"Carrito actualizado: {request.session['carrito']}")
-            print(f"Total de productos: {request.session['total_productos']}")
-            
+            request.session.modified = True  # Indicar que la sesión ha sido modificada
+
             return JsonResponse({
                 'message': 'Producto agregado al carrito con éxito',
                 'total_productos': total_productos,
@@ -97,6 +93,32 @@ def producto_list(request):
         'carrito': carrito,
         'total_productos': total_productos,
     })
+
+
+def checkout(request):
+    carrito = request.session.get('carrito', {})
+    if not carrito:
+        return redirect('inventario:carrito')  # Si el carrito está vacío, redirigir al carrito
+    
+    # Aquí implementamos la lógica para procesar la compra
+    for item in carrito.values():
+        producto = Producto.objects.get(ProductoID=item['producto_id'])
+        cantidad_comprada = item['cantidad']
+        
+        # Verificar si el stock es suficiente para completar la compra
+        if producto.Stock < cantidad_comprada:
+            return JsonResponse({'error': 'No hay suficiente stock para completar la compra'}, status=400)
+        
+        # Reducir el stock en la base de datos
+        producto.Stock -= cantidad_comprada
+        producto.save()
+
+    # Limpiar el carrito después de la compra
+    request.session['carrito'] = {}
+    request.session['total_productos'] = 0
+    request.session.modified = True
+
+    return render(request, 'inventario/compra_exitosa.html')  # Redirigir a una página de compra exitosa
 
 
 
